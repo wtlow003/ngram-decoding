@@ -1,4 +1,5 @@
 from typing import Union
+
 import torch
 from transformers import PreTrainedTokenizer, PreTrainedTokenizerFast
 
@@ -80,15 +81,6 @@ def ngram_decoding(
 
         if input_ids.shape[1] >= T:  # Check if we've reached the desired length
             break
-        # we fulfill the condition of ngrams_size + K
-        elif n_matches == ngrams_size + K:
-            # we can take the last token from the logits and append it to the input_ids
-            # we generated K+1 from the previous forward pass
-            next_token = selected_tokens[-1]
-            input_ids = torch.cat([input_ids, next_token.unsqueeze(0)], dim=1)
-            yield (next_token.item(), True)
-            if next_token == eos_token_id:
-                break
 
         if (valid_tokens == eos_token_id_tensor.item()).any():
             break
