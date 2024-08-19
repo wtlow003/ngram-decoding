@@ -79,6 +79,66 @@ python main.py --model meta-llama/Meta-Llama-3.1-8B-Instruct \
 
 ## Results
 
+https://github.com/user-attachments/assets/5b103571-a9ea-4e46-ad52-c3f91589c83e
+
+Using the following example prompt:
+
+```
+<|start_header_id|>user<|end_header_id|>
+Code:
+```python
+    def generate_candidate_tokens(
+        input_ids: torch.Tensor, n_grams: torch.Tensor, ngrams_size: int, K: int
+    ):
+        # unfold the tensor into windows of `pattern_len + following_elements_count`
+        window = input_ids.unfold(dimension=1, size=ngrams_size, step=1)
+        # compare each window with the pattern (only the parts corresponding to the pattern)
+        matching_window_indices = (window == n_grams).all(dim=2)
+        # extract the indices where there are matches
+        matching_indices = matching_window_indices.nonzero(as_tuple=True)[1]
+
+        # find candidates with the longest length
+        # based on: https://arxiv.org/pdf/2304.04487
+        # we choose the candidate with the longest length at random if there are multiple candidates
+        candidates = []
+        max_length = K
+        for idx in matching_indices:
+            start_idx = idx + ngrams_size
+            end_idx = start_idx + K
+            candidate = input_ids[0, start_idx : min(end_idx, input_ids.size(1))]
+            length = len(candidate)
+
+            if length == max_length:
+                candidates.append(candidate)
+            else:
+                # we do not consider prefix with no candidates
+                if length > max_length:
+                    max_length = length
+                    candidates = [candidate]
+
+        if candidates:
+            chosen_candidate = candidates[np.random.randint(len(candidates))]
+        else:
+            chosen_candidate = torch.tensor([], dtype=torch.long, device=input_ids.device)
+
+        return chosen_candidate.unsqueeze(dim=0)
+    ``` 
+
+ Question: Can you the variable name 'candidates' to 'candidates_tokens'? 
+
+ Modified code:
+<|start_header_id|>assistant<|end_header_id|>
+```
+
+The following results are observed:
+
+|    Decoding Method   |  Time Taken (s)  |  Token/secs  |   Speedup   |
+| -------------------- | ---------------- | ------------ | ----------- |
+|    Greedy Decoding   |      26.4        |     14.0     |      1x     | 
+|    Ngrams Decoding   |      12.8        |     28.9     |     ~2x     | 
+
+In the simple demonstration experiment, we achieved results comparable to those of the original [Prompt Lookup Decoding](https://github.com/apoorvumang/prompt-lookup-decoding?tab=readme-ov-file) implementation and the figures reported in [LLMA Decoding](https://github.com/microsoft/LMOps/tree/main/llma). Both decoding methods demonstrated approximately a 2-3x improvement in speed over greedy decoding.
+
 ## References
 
 ```
