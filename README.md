@@ -49,6 +49,34 @@ uv pip install -r requirements.txt  # Install from a requirements.txt file.
 
 ## Usage
 
+> [!NOTE]
+>
+> Currently, the script only supports `Meta-Llama-3.1-8B-Instruct` model.
+
+```bash
+# check cli options
+python main.py --help
+
+usage: main.py [-h] [--model MODEL] --decoding-method {greedy,ngram}
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --model MODEL
+  --decoding-method {greedy,ngram}
+```
+
+Running LLM inference comparison script:
+
+```bash
+# ngram decoding
+python main.py --model meta-llama/Meta-Llama-3.1-8B-Instruct \
+    --decoding-method ngram
+
+# greedy decoding
+python main.py --model meta-llama/Meta-Llama-3.1-8B-Instruct \
+    --decoding-method greedy
+```
+
 ## Results
 
 ## References

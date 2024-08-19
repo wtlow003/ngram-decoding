@@ -1,5 +1,6 @@
+from typing import Union
 import torch
-from transformers import PreTrainedTokenizer
+from transformers import PreTrainedTokenizer, PreTrainedTokenizerFast
 
 from .utils import generate_candidate_tokens
 
@@ -8,7 +9,7 @@ from .utils import generate_candidate_tokens
 def ngram_decoding(
     input_ids: torch.Tensor,
     model: torch.nn.Module,
-    tokenizer: PreTrainedTokenizer,
+    tokenizer: Union[PreTrainedTokenizer, PreTrainedTokenizerFast],
     ngrams_size: int,
     K: int,
     n: int,

@@ -1,12 +1,13 @@
+from typing import Union
 import torch
-from transformers import PreTrainedTokenizer
+from transformers import PreTrainedTokenizer, PreTrainedTokenizerFast
 
 
 @torch.no_grad()
 def greedy_decoding(
     input_ids: torch.Tensor,
     model: torch.nn.Module,
-    tokenizer: PreTrainedTokenizer,
+    tokenizer: Union[PreTrainedTokenizer, PreTrainedTokenizerFast],
     n: int = 400,
 ):
     eos_token_id = tokenizer.eos_token_id
