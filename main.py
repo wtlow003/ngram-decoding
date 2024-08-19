@@ -67,9 +67,10 @@ def main(args: argparse.Namespace):
         return chosen_candidate.unsqueeze(dim=0)
     """
     question = "Can you the variable name 'candidates' to 'candidates_tokens'?"
-    prompt = "<|start_header_id|>user<|end_header_id|>\nCode:```python\n{code_text}``` \n\n Question: {question} \n\n Modified code:\n<|start_header_id|>assistant<|end_header_id|>".format(
+    prompt = "<|start_header_id|>user<|end_header_id|>\nCode:\n```python{code_text}``` \n\n Question: {question} \n\n Modified code:\n<|start_header_id|>assistant<|end_header_id|>".format(
         code_text=input_str, question=question
     )
+    print(prompt)
     input_ids = tokenizer.encode(prompt, return_tensors="pt").to(DEVICE)
 
     if args.decoding_method == "ngram":
@@ -80,7 +81,7 @@ def main(args: argparse.Namespace):
 
         # actual run
         print("\nNgram Decoding:")
-        # torch.mps.synchronize()
+        torch.cuda.synchronize() if DEVICE == "cuda" else torch.mps.synchronize()
         nd_start = time.perf_counter()
         nd_output_ids = []
         for token_id, speculated in ngram_decoding(
@@ -97,7 +98,7 @@ def main(args: argparse.Namespace):
                     end="",
                     flush=True,
                 )
-        # torch.mps.synchronize()
+        torch.cuda.synchronize() if DEVICE == "cuda" else torch.mps.synchronize()
         nd_end = time.perf_counter()
         nd_time = nd_end - nd_start
         print(
@@ -110,7 +111,7 @@ def main(args: argparse.Namespace):
         print("Warm-up complete.")
 
         print("\nGreedy Decoding:")
-        # torch.mps.synchronize()
+        torch.cuda.synchronize() if DEVICE == "cuda" else torch.mps.synchronize()
         gd_start = time.perf_counter()
         gd_output_ids = []
         for token_id in greedy_decoding(input_ids, model, tokenizer, n=400):
@@ -118,7 +119,7 @@ def main(args: argparse.Namespace):
             print(
                 tokenizer.decode(token_id, skip_special_tokens=True), end="", flush=True
             )
-        # torch.mps.synchronize()
+        torch.cuda.synchronize() if DEVICE == "cuda" else torch.mps.synchronize()
         gd_end = time.perf_counter()
         gd_time = gd_end - gd_start
         print(
@@ -126,7 +127,7 @@ def main(args: argparse.Namespace):
         )
 
     gc.collect()
-    torch.mps.empty_cache()
+    torch.cuda.empty_cache() if DEVICE == "cuda" else torch.mps.empty_cache()
 
 
 if __name__ == "__main__":
