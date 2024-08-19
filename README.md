@@ -1,4 +1,4 @@
-<h1 align="center">N-grams Decoding</h1>
+<h1 align="center">N-gram Decoding</h1>
 
 <p align="center">
     <img src="https://img.shields.io/badge/python-3.9.10-orange"
