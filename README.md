@@ -13,6 +13,23 @@
 
 This repository contains the implementation of the ngram-decoding (aka *prompt lookup decoding*) method for faster LLM inference.
 
+This exploration aims to understand the using n-grams for loseless accelaration of LLM inference, as proposed in: 
+
+1. [Prompt Lookup Decoding](https://github.com/apoorvumang/prompt-lookup-decoding?tab=readme-ov-file)
+2. [LLMA Decoding](https://github.com/microsoft/LMOps/tree/main/llma)
+
+Combining the core ideas from both methods, I explored the following algorithm built upon the aforementioned works:
+
+1. Match the n-grams in the prompt with the tokens in the input sequence, and obtain `K` candidate tokens.
+2. If multiple candidates are found, select the set with the most candidate tokens. In case of a tie, a random selection is made.
+3. If no candidate tokens are identified, default to single-step greedy decoding.
+3. If the full `K` number of candidate tokens is selected, generate one additional token based on the logits produced in the forward pass.
+
+> [!NOTE]
+As a result, the number of tokens generated per step in n-gram decoding ranges from `1` to `K+1`.
+
+4. Repeat the above steps until either the maximum `n` number of tokens is reached or the `EOS` (e.g., `<|eot_id|>`) token is generated.
+
 ## Getting Started
 
 This project uses uv for dependency management. To install UV, run the following command:
@@ -79,6 +96,12 @@ python main.py --model meta-llama/Meta-Llama-3.1-8B-Instruct \
 
 ## Results
 
+The following results are obtained on `A100` GPU with `40GB` RAM, with the following settings:
+
+1. `ngrams_size` = 3
+2. `K` = 10
+3. `n` = 400
+
 https://github.com/user-attachments/assets/5b103571-a9ea-4e46-ad52-c3f91589c83e
 
 Using the following example prompt:
@@ -130,7 +153,7 @@ Code:
 <|start_header_id|>assistant<|end_header_id|>
 ```
 
-The following results are observed:
+The following timings are observed:
 
 |    Decoding Method   |  Time Taken (s)  |  Token/secs  |   Speedup   |
 | -------------------- | ---------------- | ------------ | ----------- |

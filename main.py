@@ -75,7 +75,7 @@ def main(args: argparse.Namespace):
 
     if args.decoding_method == "ngram":
         # warm-up run
-        print("Starting warm-up run")
+        print("\nStarting warm-up run")
         ngram_decoding(input_ids, model, tokenizer, ngrams_size=3, K=10, n=50)
         print("Warm-up complete.")
 
@@ -106,7 +106,7 @@ def main(args: argparse.Namespace):
         )
     else:
         # warm-up run
-        print("Starting warm-up run")
+        print("\nStarting warm-up run")
         greedy_decoding(input_ids, model, tokenizer, n=50)
         print("Warm-up complete.")
 
