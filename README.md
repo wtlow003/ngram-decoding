@@ -25,7 +25,7 @@ Combining the core ideas from both methods, I explored the following algorithm b
 3. If no candidate tokens are identified, default to single-step greedy decoding.
 
 > [!NOTE]
-The number of tokens generated per step in n-gram decoding ranges from `1` to `K+1`.
+> The number of tokens generated per step in n-gram decoding ranges from `1` to `K+1`.
 
 4. Repeat the above steps until either the maximum `n` number of tokens is reached or the `EOS` (e.g., `<|eot_id|>`) token is generated.
 

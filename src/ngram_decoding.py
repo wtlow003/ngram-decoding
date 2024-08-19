@@ -71,8 +71,10 @@ def ngram_decoding(
         n_matches = (
             (~(candidate_tokens == selected_tokens[:, :-1])).cumsum(dim=-1) < 1
         ).sum()
+        # minus 1 to prevent overshooting max allowable tokens
         n_matches = min(n_matches, T - cur_len - 1)
 
+        # this allow us to generate at least 1 token or K+1 tokens max
         valid_tokens = selected_tokens[:, : n_matches + 1]
         # print("selected from prompt: ", tokenizer.decode(valid_tokens[0]))
         for token_id in valid_tokens[0]:
