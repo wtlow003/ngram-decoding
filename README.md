@@ -23,10 +23,9 @@ Combining the core ideas from both methods, I explored the following algorithm b
 1. Match the n-grams in the prompt with the tokens in the input sequence, and obtain `K` candidate tokens.
 2. If multiple candidates are found, select the set with the most candidate tokens. In case of a tie, a random selection is made.
 3. If no candidate tokens are identified, default to single-step greedy decoding.
-3. If the full `K` number of candidate tokens is selected, generate one additional token based on the logits produced in the forward pass.
 
 > [!NOTE]
-As a result, the number of tokens generated per step in n-gram decoding ranges from `1` to `K+1`.
+The number of tokens generated per step in n-gram decoding ranges from `1` to `K+1`.
 
 4. Repeat the above steps until either the maximum `n` number of tokens is reached or the `EOS` (e.g., `<|eot_id|>`) token is generated.
 
