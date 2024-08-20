@@ -17,20 +17,19 @@ def generate_candidate_tokens(
     # based on: https://arxiv.org/pdf/2304.04487
     # we choose the candidate with the longest length at random if there are multiple candidates
     candidates = []
-    max_length = K
+    min_length = 1
     for idx in matching_indices:
         start_idx = idx + ngrams_size
         end_idx = start_idx + K
         candidate = input_ids[0, start_idx : min(end_idx, input_ids.size(1))]
         length = len(candidate)
 
-        if length == max_length:
+        if length == min_length:
             candidates.append(candidate)
-        else:
-            # we do not consider prefix with no candidates
-            if length > max_length:
-                max_length = length
-                candidates = [candidate]
+        elif length > min_length:
+            min_length = length
+            candidates = [candidate]
+            
 
     if candidates:
         chosen_candidate = candidates[np.random.randint(len(candidates))]
