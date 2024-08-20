@@ -54,12 +54,12 @@ def ngram_decoding(
             continue
 
         prefix = torch.cat([input_ids, candidate_tokens], dim=1)
-        # include the ngram_size + K + 1 in the logits
-        logits = model(prefix).logits[:, cur_len - 1 : cur_len + ngrams_size + K, :]
+        # include the max(1, K) + 1 in the logits
+        logits = model(prefix).logits[:, -candidate_tokens.shape[1] - 1 :, :]
 
         assert (
             logits.shape[1] == candidate_tokens.shape[1] + 1
-        ), f"Expected logits shape: {ngrams_size + K + 1}, got: {logits.shape[1]}"
+        ), f"Expected logits shape: {candidate_tokens.shape[1] + 1}, got: {logits.shape[1]}"
 
         selected_tokens = logits.argmax(dim=-1)
         # calculate the number of consecutive matching tokens between candidate_tokens and selected_tokens:
